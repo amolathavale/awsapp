@@ -28,6 +28,7 @@ Mappings:
       CIDR: '10.0.2.0/24'
     PrivateTwo:
       CIDR: '10.0.3.0/24'
+
 Resources:
   # VPC in which containers will be networked.
   # It has two public subnets, and two private subnets.

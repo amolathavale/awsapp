@@ -201,3 +201,33 @@ resource "aws_iam_role" "ECSTaskRole" {
     name = "EcsServiceRole"
     assume_role_policy = "${data.aws_iam_policy_document.EcsServicePolicy.json}"
 }
+
+## NLB
+resource "aws_lb" "digitek-nlb" {
+    load_balancer_type = "network"
+    name = "digitek-nlb"
+    subnets = ["${aws_subnet.PublicSubnet1}", "${aws_subnet.PublicSubnet2}"]
+
+}
+resource "aws_lb_target_group" "DigitekLB-TargetGroup" {
+    name = "DigitekLB-TargetGroup"
+    port = 8080
+    protocol = "TCP"
+    target_type = "ip"
+    vpc_id = "${aws_vpc.mainvpc.id}"
+    health_check = {
+        path = "/"
+        interval = "10"
+        protocol = "HTTP"
+        threshold = 3
+        unhealthy = 3
+
+    }
+}
+
+resource "aws_lb_listener" "Digitek-LBListener" {
+    load_balancer_arn = "${aws_lb.digitek-nlb.arn}"
+    port = 80
+    protocol = "TCP"
+}
+#aws elbv2 create-listener --default-actions TargetGroupArn=REPLACE_ME_NLB_TARGET_GROUP_ARN,Type=forward --load-balancer-arn REPLACE_ME_NLB_ARN --port 80 --protocol TCP
